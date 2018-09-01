@@ -1,0 +1,36 @@
+//Configure KdbController as Windows Service
+
+1. Go to https://www.microsoft.com/en-my/download/confirmation.aspx?id=17657 and download the Windows Service 2013 Kit Resources
+
+2. After downloading run the executable and place it within C:\WindowsService_Configuration
+
+3. Open the Command Prompt as (Administrator) and copy the srvany.exe from C:\WindowsService_Configuration to C:\q
+
+4. Go under the directory C:\WindowsService_Configuration and type
+   'instsrv.exe KdbController c:\q\srvany.exe'
+
+5.Go to services.msc on the start menu and you will be able to see KdbController as a service
+
+6.Type regedit on the start menu and go to the following path to add Parameters
+  Windows Registry Editor Version 5.00
+  Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\KdbController\Parameters
+  [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\KdbController\Parameters]
+  "Application"="c:\\q\\w32\\q.exe"
+  "AppParameters"="-p 5000 -q"
+  "AppDirectory"="c:\\q"
+
+  If you need to add some logging information then you need to modify the parameters as below
+  [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\KdbController\Parameters]
+  "Application"="c:\\WINDOWS\\system32\\cmd.exe"
+  "AppParameters"="/c c:\\q\\w32\\q.exe -p 5000 -q >c:\\q\\logs\\KdbController.5000.log"
+  "AppDirectory"="c:\\q"
+ 
+  Notes:Make Sure that directory c:\q\logs exist otherwise the service cannot start
+
+7.To start/stop/query the service while is up type sc start KdbController/sc stop KdbController/sc query KdbController
+
+
+
+
+
+

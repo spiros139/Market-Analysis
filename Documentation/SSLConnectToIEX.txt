@@ -1,0 +1,57 @@
+
+
+//Create CA certificate go to C:\q\w32\
+
+$ openssl genrsa 2048 > ca-key.pem
+$ openssl req -new -x509 -nodes -days 3600 -key ca-key.pem -out ca.pem -extensions usr_cert -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=*.{MYDOMAIN}"
+
+//Create server certificate, remove passphrase, and sign it
+//server-crt.pem = public key, server-key.pem = private key
+openssl req -newkey rsa:2048 -days 3600 -nodes -keyout server-key.pem -out server-req.pem -extensions usr_cert -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=*.{MYDOMAIN}"
+openssl rsa -in server-key.pem -out server-key.pem
+openssl x509 -req -in server-req.pem -days 3600 -CA ca.pem -CAkey ca-key.pem -set_serial 01 -out server-crt.pem -extensions usr_cert
+
+
+// Create client certificate, remove passphrase, and sign it
+// client-crt.pem = public key, client-key.pem = private key
+openssl req -newkey rsa:2048 -days 3600 -nodes -keyout client-key.pem -out client-req.pem -extensions usr_cert -subj "/C=US/ST=New York/L=Brooklyn/O=Example Brooklyn Company/CN=*.{MYDOMAIN}"
+openssl rsa -in client-key.pem -out client-key.pem
+openssl x509 -req -in client-req.pem -days 3600 -CA ca.pem -CAkey ca-key.pem -set_serial 01 -out client-crt.pem -extensions usr_cert
+
+
+// Write Down Enviromental Variables
+// Download the cacert.pem from the following site and place it within /C/q/w32/certificates
+
+// Flag the following enviromental variables when starting kdb
+C:\q\w32>set SSL_CERT_FILE=C:\kdb\framework\trunk\base\bin\server-crt.pem
+C:\q\w32>set SSL_KEY_FILE=C:\kdb\framework\trunk\base\bin\server-key.pem
+C:\q\w32>set SSL_CA_CERT_FILE=C:\kdb\framework\trunk\base\bin\cacert.pem
+C:\q\w32>set SSL_CA_CERT_PATH=C:\kdb\framework\trunk\base\bin\
+
+//When you are on the following path set the variables below and start kdb
+set SSL_CERT_FILE=C:\q\w32\certificates\server-crt.pem
+set SSL_KEY_FILE=C:\q\w32\certificates\server-key.pem
+set SSL_CA_CERT_FILE=C:\q\w32\certificates\cacert.pem
+set SSL_CA_CERT_PATH=C:\q\w32\certificates\
+
+C:\kdb\market_analysis\trunk\code>C:\q\w32\q feedhandler.q -p 5001
+
+KDB+ 3.4 2016.12.08 Copyright (C) 1993-2016 Kx Systems
+w32/ 4()core 4095MB owner desktop-ue9v62a 192.168.174.1 NONEXPIRE
+
+Welcome to kdb+ 32bit edition
+For support please see http://groups.google.com/d/forum/personal-kdbplus
+Tutorials can be found at http://code.kx.com/wiki/Tutorials
+To exit, type \\
+To remove this startup msg, edit q.q
+q)get_last_trade`aapl
+sym  price  size time
+----------------------------------------------
+AAPL 227.65 100  2018.08.31D19:59:39.191000064
+
+
+
+
+
+
+
